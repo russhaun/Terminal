@@ -17,17 +17,29 @@ namespace TerminalApp
         NewTabProfile6,
         NewTabProfile7,
         NewTabProfile8,
-        NewTabProfile9,
         NewWindow,
         CloseWindow,
         CloseTab,
-        SwitchToTab,
         NextTab,
         PrevTab,
+        SplitVertical,
+        SplitHorizontal,
+        SwitchToTab0,
+        SwitchToTab1,
+        SwitchToTab2,
+        SwitchToTab3,
+        SwitchToTab4,
+        SwitchToTab5,
+        SwitchToTab6,
+        SwitchToTab7,
+        SwitchToTab8,
         IncreaseFontSize,
         DecreaseFontSize,
         ScrollUp,
-        ScrollDown
+        ScrollDown,
+        ScrollUpPage,
+        ScrollDownPage,
+        OpenSettings
     };
 
     delegate void CopyTextEventArgs();
@@ -37,13 +49,18 @@ namespace TerminalApp
     delegate void NewWindowEventArgs();
     delegate void CloseWindowEventArgs();
     delegate void CloseTabEventArgs();
-    delegate void SwitchToTabEventArgs();
     delegate void NextTabEventArgs();
     delegate void PrevTabEventArgs();
+    delegate void SplitVerticalEventArgs();
+    delegate void SplitHorizontalEventArgs();
+    delegate void SwitchToTabEventArgs(Int32 profileIndex);
     delegate void IncreaseFontSizeEventArgs();
     delegate void DecreaseFontSizeEventArgs();
     delegate void ScrollUpEventArgs();
     delegate void ScrollDownEventArgs();
+    delegate void ScrollUpPageEventArgs();
+    delegate void ScrollDownPageEventArgs();
+    delegate void OpenSettingsEventArgs();
 
     [default_interface]
     runtimeclass AppKeyBindings : Microsoft.Terminal.Settings.IKeyBindings
@@ -51,6 +68,7 @@ namespace TerminalApp
         AppKeyBindings();
 
         void SetKeyBinding(ShortcutAction action, Microsoft.Terminal.Settings.KeyChord chord);
+        Microsoft.Terminal.Settings.KeyChord GetKeyBinding(ShortcutAction action);
 
         event CopyTextEventArgs CopyText;
         event PasteTextEventArgs PasteText;
@@ -62,9 +80,14 @@ namespace TerminalApp
         event SwitchToTabEventArgs SwitchToTab;
         event NextTabEventArgs NextTab;
         event PrevTabEventArgs PrevTab;
+        event SplitVerticalEventArgs SplitVertical;
+        event SplitHorizontalEventArgs SplitHorizontal;
         event IncreaseFontSizeEventArgs IncreaseFontSize;
         event DecreaseFontSizeEventArgs DecreaseFontSize;
         event ScrollUpEventArgs ScrollUp;
         event ScrollDownEventArgs ScrollDown;
+        event ScrollUpPageEventArgs ScrollUpPage;
+        event ScrollDownPageEventArgs ScrollDownPage;
+        event OpenSettingsEventArgs OpenSettings;
     }
 }

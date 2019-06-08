@@ -26,7 +26,7 @@ namespace Microsoft::Console
 
         [[nodiscard]]
         HRESULT Start();
-        static DWORD StaticVtInputThreadProc(_In_ LPVOID lpParameter);
+        static DWORD WINAPI StaticVtInputThreadProc(_In_ LPVOID lpParameter);
         void DoReadInput(const bool throwOnFail);
 
     private:
@@ -41,7 +41,7 @@ namespace Microsoft::Console
         bool _exitRequested;
         HRESULT _exitResult;
 
-        std::unique_ptr<StateMachine> _pInputStateMachine;
+        std::unique_ptr<Microsoft::Console::VirtualTerminal::StateMachine> _pInputStateMachine;
         Utf8ToWideCharParser _utf8Parser;
     };
 }

@@ -41,9 +41,12 @@ namespace winrt::Microsoft::Terminal::TerminalControl::implementation
         hstring Title();
         void CopySelectionToClipboard(bool trimTrailingWhitespace);
         void Close();
+        bool ShouldCloseOnExit() const noexcept;
 
         void ScrollViewport(int viewTop);
+        void KeyboardScrollViewport(int viewTop);
         int GetScrollOffset();
+        int GetViewHeight() const;
 
         void SwapChainChanged();
         ~TermControl();
@@ -68,12 +71,13 @@ namespace winrt::Microsoft::Terminal::TerminalControl::implementation
         Windows::UI::Xaml::Controls::Primitives::ScrollBar _scrollBar;
         event_token _connectionOutputEventToken;
 
-        ::Microsoft::Terminal::Core::Terminal* _terminal;
+        std::unique_ptr<::Microsoft::Terminal::Core::Terminal> _terminal;
 
         std::unique_ptr<::Microsoft::Console::Render::Renderer> _renderer;
         std::unique_ptr<::Microsoft::Console::Render::DxEngine> _renderEngine;
 
         Settings::IControlSettings _settings;
+        bool _focused;
         bool _closing;
 
         FontInfoDesired _desiredFont;
@@ -84,12 +88,16 @@ namespace winrt::Microsoft::Terminal::TerminalControl::implementation
         // storage location for the leading surrogate of a utf-16 surrogate pair
         std::optional<wchar_t> _leadingSurrogate;
 
+        std::optional<Windows::UI::Xaml::DispatcherTimer> _cursorTimer;
+
         // If this is set, then we assume we are in the middle of panning the
         //      viewport via touch input.
         std::optional<winrt::Windows::Foundation::Point> _touchAnchor;
 
         void _Create();
         void _ApplyUISettings();
+        void _InitializeBackgroundBrush();
+        void _BackgroundColorChanged(const uint32_t color);
         void _ApplyConnectionSettings();
         void _InitializeTerminal();
         void _UpdateFont();
@@ -100,7 +108,10 @@ namespace winrt::Microsoft::Terminal::TerminalControl::implementation
         void _PointerReleasedHandler(Windows::Foundation::IInspectable const& sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs const& e);
         void _MouseWheelHandler(Windows::Foundation::IInspectable const& sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs const& e);
         void _ScrollbarChangeHandler(Windows::Foundation::IInspectable const& sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs const& e);
+        void _GotFocusHandler(Windows::Foundation::IInspectable const& sender, Windows::UI::Xaml::RoutedEventArgs const& e);
+        void _LostFocusHandler(Windows::Foundation::IInspectable const& sender, Windows::UI::Xaml::RoutedEventArgs const& e);
 
+        void _BlinkCursor(Windows::Foundation::IInspectable const& sender, Windows::Foundation::IInspectable const& e);
         void _SendInputToConnection(const std::wstring& wstr);
         void _SwapChainSizeChanged(Windows::Foundation::IInspectable const& sender, Windows::UI::Xaml::SizeChangedEventArgs const& e);
         void _SwapChainScaleChanged(Windows::UI::Xaml::Controls::SwapChainPanel const& sender, Windows::Foundation::IInspectable const& args);
@@ -117,6 +128,7 @@ namespace winrt::Microsoft::Terminal::TerminalControl::implementation
 
         Settings::KeyModifiers _GetPressedModifierKeys() const;
 
+        const COORD _GetTerminalPosition(winrt::Windows::Foundation::Point cursorPosition);
     };
 }
 

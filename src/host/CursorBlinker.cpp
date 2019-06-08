@@ -5,7 +5,9 @@
 #include "../host/scrolling.hpp"
 #include "../interactivity/inc/ServiceLocator.hpp"
 #pragma hdrstop
+
 using namespace Microsoft::Console;
+using namespace Microsoft::Console::Interactivity;
 
 CursorBlinker::CursorBlinker() :
     _hCaretBlinkTimer(INVALID_HANDLE_VALUE),
@@ -129,7 +131,7 @@ DoScroll:
     Scrolling::s_ScrollIfNecessary(ScreenInfo);
 }
 
-void CALLBACK CursorTimerRoutineWrapper(_In_ PVOID /* lpParam */, _In_ BOOL /* TimerOrWaitFired */)
+void CALLBACK CursorTimerRoutineWrapper(_In_ PVOID /* lpParam */, _In_ BOOLEAN /* TimerOrWaitFired */)
 {
     // Suppose the following sequence of events takes place:
     //
@@ -192,7 +194,7 @@ void CursorBlinker::SetCaretTimer()
 
         bRet = CreateTimerQueueTimer(&_hCaretBlinkTimer,
                                      _hCaretBlinkTimerQueue,
-                                     (WAITORTIMERCALLBACKFUNC)CursorTimerRoutineWrapper,
+                                     CursorTimerRoutineWrapper,
                                      this,
                                      dwEffectivePeriod,
                                      dwEffectivePeriod,

@@ -20,6 +20,7 @@ struct PTY_SIGNAL_RESIZE
 
 using namespace Microsoft::Console;
 using namespace Microsoft::Console::Interactivity;
+using namespace Microsoft::Console::VirtualTerminal;
 
 // Constructor Description:
 // - Creates the PTY Signal Input Thread.
@@ -51,7 +52,7 @@ PtySignalInputThread::~PtySignalInputThread()
 // - lpParameter - A pointer to the PtySignalInputTHread instance that should be called.
 // Return Value:
 // - The return value of the underlying instance's _InputThread
-DWORD PtySignalInputThread::StaticThreadProc(_In_ LPVOID lpParameter)
+DWORD WINAPI PtySignalInputThread::StaticThreadProc(_In_ LPVOID lpParameter)
 {
     PtySignalInputThread* const pInstance = reinterpret_cast<PtySignalInputThread*>(lpParameter);
     return pInstance->_InputThread();
@@ -175,12 +176,12 @@ HRESULT PtySignalInputThread::Start() noexcept
 
     hThread = CreateThread(nullptr,
                            0,
-                           (LPTHREAD_START_ROUTINE)PtySignalInputThread::StaticThreadProc,
+                           PtySignalInputThread::StaticThreadProc,
                            this,
                            0,
                            &dwThreadId);
 
-    RETURN_LAST_ERROR_IF(hThread == INVALID_HANDLE_VALUE);
+    RETURN_LAST_ERROR_IF_NULL(hThread);
     _hThread.reset(hThread);
     _dwThreadId = dwThreadId;
 

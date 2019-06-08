@@ -16,7 +16,8 @@
 #include "handle.h"
 
 using namespace Microsoft::Console;
-
+using namespace Microsoft::Console::Interactivity;
+using namespace Microsoft::Console::VirtualTerminal;
 // Constructor Description:
 // - Creates the VT Input Thread.
 // Arguments:
@@ -90,7 +91,7 @@ HRESULT VtInputThread::_HandleRunInput(_In_reads_(cch) const byte* const charBuf
 // - lpParameter - A pointer to the VtInputThread instance that should be called.
 // Return Value:
 // - The return value of the underlying instance's _InputThread
-DWORD VtInputThread::StaticVtInputThreadProc(_In_ LPVOID lpParameter)
+DWORD WINAPI VtInputThread::StaticVtInputThreadProc(_In_ LPVOID lpParameter)
 {
     VtInputThread* const pInstance = reinterpret_cast<VtInputThread*>(lpParameter);
     return pInstance->_InputThread();
@@ -167,12 +168,12 @@ HRESULT VtInputThread::Start()
 
     hThread = CreateThread(nullptr,
                            0,
-                           (LPTHREAD_START_ROUTINE)VtInputThread::StaticVtInputThreadProc,
+                           VtInputThread::StaticVtInputThreadProc,
                            this,
                            0,
                            &dwThreadId);
 
-    RETURN_LAST_ERROR_IF(hThread == INVALID_HANDLE_VALUE);
+    RETURN_LAST_ERROR_IF_NULL(hThread);
     _hThread.reset(hThread);
     _dwThreadId = dwThreadId;
 
